@@ -4,21 +4,35 @@ namespace GalgenSpiel
 {
     class Program
     {
+        private const int maxVersuche = 10;
+
         static void Main(string[] args)
         {
             do {
                 bool geloest = false;
                 int versuche = 1;
 
-                string spAWort = EingabeA();
+                Console.Clear();
+                string spAWort = Eingabe("Spieler A gibt bitte ein Wort ein: ");
                 char[] spBArray = new char[spAWort.Length];
                 do
                 {
-                    char spBZeichen = EingabeB()[0];
+                    Console.Clear();
+
+                    Anzeige(spBArray);
+
+                    Console.WriteLine("Spieler B das ist Versuch {0}/{1}", versuche, maxVersuche);
+                    char spBZeichen = Eingabe("Spieler B gibt einen Buchstaben ein: ")[0];
 
                     geloest = spAWort.Length == Vergleich(spAWort, spBArray, spBZeichen);
-                    
+
                     Anzeige(spBArray);
+
+                    if (!geloest && AbfrageLoesen())
+                    {
+                        geloest = spAWort == EingabeLoesungswort(spAWort.Length);
+                    }
+
                     if (geloest)
                     {
                         Console.WriteLine("\n\nHerzlichen Glückwunsch, du hast das Wort erraten\nweiter mit beliebiger Taste...");
@@ -26,39 +40,24 @@ namespace GalgenSpiel
                         break;
                     }
 
-                    if (!geloest && AbfrageLoesen())
-                    {
-                        geloest = spAWort == EingabeLoesungswort(spAWort.Length);
-                    }
-
-                } while (versuche++ < 10 && !geloest);
+                } while (++versuche <= maxVersuche && !geloest);
 
                 Console.Clear();
+                if (!geloest)
+                {
+                    Console.WriteLine("Schade Spieler B, du hast das Wort {0} nicht erraten können", spAWort);
+                }
                 Console.Write("Neues Spiel? :");
             } while (Console.ReadKey().Key == ConsoleKey.J);
         }
 
-        static string EingabeA()
+        static string Eingabe(string msg)
         {
             string input;
             do
             {
-                Console.Clear();
-                Console.Write("Spieler A bitte Wort eingeben: ");
-
+                Console.Write("\n"+msg);
             } while ((input = Console.ReadLine()).Length == 0);
-            return input.ToUpper();
-        }
-
-        static string EingabeB()
-        {
-            string input;
-            do
-            {
-                Console.Clear();
-                Console.Write("Spieler B: ");
-
-            } while ((input = Console.ReadKey().KeyChar.ToString()).Length != 1);
             return input.ToUpper();
         }
 
@@ -118,6 +117,7 @@ namespace GalgenSpiel
                     Console.Write("_ ");
                 }
             }
+            Console.WriteLine();
             Console.ForegroundColor = color;
         }
     }
